@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -30,33 +31,31 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Root endpoint
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Pet Your Pet Backend API',
-    version: '2.0.0',
-    endpoints: {
-      health: '/api/health',
-      auth: '/api/auth',
-      pets: '/api/pets'
-    }
-  });
-});
-
-// API Routes
+// API Routes (must come before static files)
 app.use('/api/auth', authRoutes);
 app.use('/api/pets', petsRoutes);
 
-// 404 handler
-app.use(notFound);
+// Serve static files from frontend build in production
+const frontendDistPath = path.join(__dirname, '../../frontend/dist');
+app.use(express.static(frontendDistPath));
+
+// Catch-all middleware to serve index.html for client-side routing
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api')) {
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  } else {
+    next();
+  }
+});
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📡 API endpoints available at http://localhost:${PORT}/api`);
-  console.log(`🔒 Auth endpoints: http://localhost:${PORT}/api/auth`);
-  console.log(`🐾 Pets endpoints: http://localhost:${PORT}/api/pets`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📡 API endpoints available at /api`);
+  console.log(`🔒 Auth endpoints: /api/auth`);
+  console.log(`🐾 Pets endpoints: /api/pets`);
+  console.log(`🌐 Frontend served from: ${frontendDistPath}`);
 });
