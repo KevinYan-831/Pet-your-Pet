@@ -29,7 +29,7 @@ Pet Your Pet is a full-stack web application where users can create customized p
 - **Database ORM:** Drizzle ORM 0.44.7
 - **Database:** PostgreSQL (Supabase)
 - **Authentication:** Supabase Service Role
-- **Port:** 3000 (internal, not exposed)
+- **Port:** 3000 (development), 5000 (production - serves both API and frontend)
 
 ### Database
 - **Provider:** Supabase (Neon-backed PostgreSQL)
@@ -206,6 +206,7 @@ Schema location: `backend/src/config/schema.js`
 
 ## Recent Changes (Nov 21, 2025)
 
+### Initial Setup
 1. ✅ Configured backend to run on port 3000 (moved from 5000 to avoid conflict)
 2. ✅ Configured frontend Vite to run on 0.0.0.0:5000 for Replit proxy with proper HMR settings
 3. ✅ Fixed secret name mapping (DATABASE_URL = Supabase URL, SUPABASE_URL = PostgreSQL connection)
@@ -220,6 +221,16 @@ Schema location: `backend/src/config/schema.js`
 7. ✅ Updated .gitignore for Node.js best practices
 8. ✅ Installed all dependencies for both frontend and backend
 9. ✅ Verified application runs successfully in Replit environment
+
+### Deployment Configuration (Nov 21, 2025)
+10. ✅ Updated backend to serve frontend static files from `frontend/dist/`
+11. ✅ Implemented Express 5-compatible catch-all middleware for client-side routing
+12. ✅ Configured backend to listen on port 5000 with 0.0.0.0 binding in production
+13. ✅ Updated frontend API URLs to use relative paths (`/api`) for production
+14. ✅ Fixed deployment build command for monorepo structure
+15. ✅ Simplified deployment run command to single server (backend serves both API and frontend)
+16. ✅ Set production environment variables (PORT=5000, NODE_ENV=production)
+17. ✅ Verified production configuration with local testing
 
 ## Troubleshooting
 
@@ -249,14 +260,24 @@ Schema location: `backend/src/config/schema.js`
 ### Replit Deployment
 The application is configured for Replit Deploy with:
 - **Deployment Type:** autoscale (stateless)
-- **Build Command:** Installs dependencies for both frontend and backend, then builds frontend
-- **Run Command:** Starts backend on port 3000 and serves frontend static files from Vite preview on port 5000
-- **Port:** 5000 (exposed to the internet)
+- **Build Command:** `cd backend && npm install && cd ../frontend && npm install && npm run build`
+- **Run Command:** `node backend/src/index.js` (serves both API and frontend static files)
+- **Port:** 5000 (backend serves API on /api and frontend from root)
+- **Architecture:** Single Express server serves both the API and prebuilt React SPA
+
+**How it works in production:**
+1. Backend starts on port 5000 (via PORT environment variable)
+2. API routes are mounted at `/api/*`
+3. Frontend static files (from `frontend/dist/`) are served at the root
+4. Catch-all middleware serves `index.html` for client-side routing (React Router)
+5. Frontend uses relative URLs (`/api`) to call the backend on the same origin
 
 **For production deployment on Replit:**
-1. Click the "Deploy" button in the Replit interface
-2. Ensure all secrets are set (DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY)
-3. The deployment will automatically build and serve the application
+1. Click the "Deploy" (or "Publish") button in the Replit interface
+2. Ensure all secrets are set in production environment (DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY)
+3. Review the autoscale deployment configuration (already set up)
+4. Click "Publish" - the deployment will automatically build and serve the application
+5. After deployment, you can add your custom domain in the Deployments settings
 
 **For external deployment:**
 - **Frontend:** Firebase Hosting, Vercel, Netlify, or similar static hosting
