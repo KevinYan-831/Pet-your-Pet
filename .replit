@@ -14,7 +14,6 @@ VITE_API_URL = "http://localhost:3000/api"
 VITE_SUPABASE_URL = "https://nyyraxgibahkehtujhpu.supabase.co"
 
 [userenv.shared]
-SUPABASE_PROJECT_URL = "https://nyyraxgibahkehtujhpu.supabase.co"
 FRONTEND_URL = "*"
 
 [workflows]
@@ -49,6 +48,7 @@ externalPort = 3000
 localPort = 5000
 externalPort = 80
 
-[[ports]]
-localPort = 37201
-externalPort = 3001
+[deployment]
+deploymentTarget = "autoscale"
+run = ["bash", "-c", "cd backend && node src/index.js & cd ../frontend && npx vite preview --host 0.0.0.0 --port 5000"]
+build = ["bash", "-c", "cd frontend && npm install && npm run build && cd ../backend && npm install"]

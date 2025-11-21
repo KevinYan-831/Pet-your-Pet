@@ -4,10 +4,11 @@ const { pets } = require('./schema');
 require('dotenv').config();
 
 // Create PostgreSQL connection
-const connectionString = process.env.DATABASE_URL;
+// Note: SUPABASE_URL contains the PostgreSQL connection string
+const connectionString = process.env.SUPABASE_URL;
 
 if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable is not set');
+  throw new Error('SUPABASE_URL (PostgreSQL connection string) environment variable is not set');
 }
 
 // Initialize postgres client
