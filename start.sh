@@ -41,7 +41,7 @@ echo "Setting up frontend environment..."
 cat > frontend/.env.local << EOF
 VITE_SUPABASE_URL=${DATABASE_URL}
 VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
-VITE_API_URL=http://localhost:3000/api
+VITE_API_URL=/api
 EOF
 
 # Start backend in background with environment variables
